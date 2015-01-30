@@ -1,34 +1,47 @@
 define(function (require, exports, module) {
 	"use strict";
 
-	//load dependencies
-	var CommandManager = brackets.getModule("command/CommandManager"),
-		Menus          = brackets.getModule("command/Menus"),
-		EditorManager  = brackets.getModule("editor/EditorManager");
-	
-	var editor  = EditorManager.getActiveEditor();
-		parent  = window.frameElement.ownerDocument,
-		srcCode = editor.document.getValue();
+ 	var AppInit = brackets.getModule("utils/AppInit");
+	var EditorManager = brackets.getModule("editor/EditorManager");
 
-	var onChange = function(){
-		var obj = {
-			type: "bramble:change",
-			sourceCode: srcCode
-		};
-		
-		return obj;
-	};
+	var fs = brackets.getModule("filesystem/FileSystem")._impl;
+	var parentWindow = window.frameElement.ownerDocument;
+	var sourceCode;
+	var codeMirror;
 
-	$(EditorManager).on("activeEditorChange", onChange);
+	AppInit.appReady(function() {
+		// Once the app has loaded our file,
+		// and we can be confident the editor is open,
+		// get a reference to it and attach our "onchange"
+		// listener to codemirror
+		codeMirror = EditorManager.getActiveEditor()._codeMirror;
 
-	//parent.postMessage();
+		codeMirror.on("change", function(e){
+			parentWindow.postMessage({
+				type: "bramble:change",
+				sourceCode: codeMirror.getValue()
+			}, "*");
+		});
+	});
 
-	// First, register a command - a UI-less object associating an id to a handler
-	var MY_COMMAND_ID = "thimbleProxy"; // package-style naming to avoid collisions
-	CommandManager.register("Thimble Proxy", MY_COMMAND_ID, onChange);
-	
-	// Then create a menu item bound to the command
-	// The label of the menu item is the name we gave the command (see above)
-	var menu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
-	menu.addMenuItem(MY_COMMAND_ID, "Ctrl-Alt-H");
+	// Eventually, we'll listen for a message from
+	// thimble containing the make's initial code.
+	// For now, we are defaulting to thimble's starter
+	// make.
+	expors.initExtension = function() {
+		var deferred = new $.Deferred();
+		var initialSource = "htmlgoeshere";
+
+		// Filesystem write goes here
+		fs.writeFile('/index.html', initialSource, function(err) {
+			if (err) {
+				deferred.reject();
+				return;
+			}
+
+			deferred.resolve();
+		});
+
+		return deferred.promise();
+	}
 });
