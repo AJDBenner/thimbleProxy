@@ -27,16 +27,16 @@ define(function (require, exports, module) {
 		// listener to codemirror
 		codeMirror = EditorManager.getActiveEditor()._codeMirror;
 
-		parentWindow.postMessage({
+		parentWindow.postMessage(JSON.stringify({
 			type: "bramble:change",
 			sourceCode: codeMirror.getValue()
-		}, "*");
+		}), "*");
 
 		codeMirror.on("change", function(e){
-			parentWindow.postMessage({
+			parentWindow.postMessage(JSON.stringify({
 				type: "bramble:change",
 				sourceCode: codeMirror.getValue()
-			}, "*");
+			}), "*");
 		});
 	});
 
