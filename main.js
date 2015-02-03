@@ -3,11 +3,22 @@ define(function (require, exports, module) {
 
  	var AppInit = brackets.getModule("utils/AppInit");
 	var EditorManager = brackets.getModule("editor/EditorManager");
+	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
+	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
+	var ProjectManager = brackets.getModule("project/ProjectManager");
+	var ProjectModel = brackets.getModule("project/ProjectModel");
 
-	var fs = brackets.getModule("filesystem/FileSystem")._impl;
-	var parentWindow = window.frameElement.ownerDocument;
+	var fs = appshell.MakeDrive.fs();
+	var parentWindow = window.parent;
 	var sourceCode;
 	var codeMirror;
+	var params = new UrlParams();
+	var initialProjectPath = ProjectManager.getInitialProjectPath();
+
+	// Force entry to if statments on line 262 of brackets.js to create 
+	// a new project
+	PreferencesManager.setViewState("afterFirstLaunch", false);
+	params.remove("skipSampleProjectLoad");
 
 	AppInit.appReady(function() {
 		// Once the app has loaded our file,
@@ -15,6 +26,11 @@ define(function (require, exports, module) {
 		// get a reference to it and attach our "onchange"
 		// listener to codemirror
 		codeMirror = EditorManager.getActiveEditor()._codeMirror;
+
+		parentWindow.postMessage({
+			type: "bramble:change",
+			sourceCode: codeMirror.getValue()
+		}, "*");
 
 		codeMirror.on("change", function(e){
 			parentWindow.postMessage({
@@ -28,10 +44,9 @@ define(function (require, exports, module) {
 	// thimble containing the make's initial code.
 	// For now, we are defaulting to thimble's starter
 	// make.
-	expors.initExtension = function() {
+	exports.initExtension = function() {
 		var deferred = new $.Deferred();
 		var initialSource = "htmlgoeshere";
-
 		// Filesystem write goes here
 		fs.writeFile('/index.html', initialSource, function(err) {
 			if (err) {
