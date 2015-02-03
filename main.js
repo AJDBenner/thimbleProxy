@@ -46,7 +46,15 @@ define(function (require, exports, module) {
 	// make.
 	exports.initExtension = function() {
 		var deferred = new $.Deferred();
-		var initialSource = "htmlgoeshere";
+		var initialSource = "<!doctype html>" +
+							"<html>" +
+  							"<head>" +
+  							"<meta charset='utf-8'>" +
+                            "<title>Your Awesome Webpage created on Tue, Feb 3 2015 6:15 PM</title>" +
+  							"</head>" +
+  							"<body>" +
+    						"<p>Make something amazing with the web</p>" +
+  							"</body";
 		// Filesystem write goes here
 		fs.writeFile('/index.html', initialSource, function(err) {
 			if (err) {
