@@ -5,15 +5,14 @@ define(function (require, exports, module) {
 	var EditorManager = brackets.getModule("editor/EditorManager");
 	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
 	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
-	var ProjectManager = brackets.getModule("project/ProjectManager");
-	var ProjectModel = brackets.getModule("project/ProjectModel");
 
 	var fs = appshell.MakeDrive.fs();
 	var parentWindow = window.parent;
 	var sourceCode;
 	var codeMirror;
 	var params = new UrlParams();
-	var initialProjectPath = ProjectManager.getInitialProjectPath();
+
+	var defaultHTML = require("text!default.html");
 
 	// Force entry to if statments on line 262 of brackets.js to create 
 	// a new project
@@ -46,18 +45,8 @@ define(function (require, exports, module) {
 	// make.
 	exports.initExtension = function() {
 		var deferred = new $.Deferred();
-		var initialSource = "<!DOCTYPE html>" +
-							"<html>" +
-  							"<head>" +
-  							"<meta charset='utf-8'>" +
-                            "<title>Your Awesome Webpage created on Tue, Feb 3 2015 6:15 PM</title>" +
-  							"</head>" +
-  							"<body>" +
-    						"<p>Make something amazing with the web</p>" +
-  							"</body>" +
-  							"</html>";
-		// Filesystem write goes here
-		fs.writeFile('/index.html', initialSource, function(err) {
+
+		fs.writeFile('/index.html', defaultHTML, function(err) {
 			if (err) {
 				deferred.reject();
 				return;
