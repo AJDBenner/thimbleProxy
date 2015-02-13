@@ -46,7 +46,8 @@ define(function (require, exports, module) {
 	// make.
 	exports.initExtension = function() {
 		var deferred = new $.Deferred();
-		var initialSource = "<!doctype html>" +
+		var initialSource = "<!DOCTYPE html>" +
+							"<html>" +
   							"<head>" +
   							"<meta charset='utf-8'>" +
                             "<title>Your Awesome Webpage created on Tue, Feb 3 2015 6:15 PM</title>" +
