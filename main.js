@@ -8,14 +8,14 @@ define(function (require, exports, module) {
 	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
 	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
 
-	var fs = appshell.MakeDrive.fs();
+	var fs = appshell.Filer.fs();
 	var parentWindow = window.parent;
 	var codeMirror;
 	var params = new UrlParams();
 
 	var defaultHTML = require("text!default.html");
 
-	// Force entry to if statments on line 262 of brackets.js to create 
+	// Force entry to if statments on line 262 of brackets.js to create
 	// a new project
 	PreferencesManager.setViewState("afterFirstLaunch", false);
 	params.remove("skipSampleProjectLoad");
