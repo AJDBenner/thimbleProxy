@@ -1,14 +1,15 @@
+/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
+/*global define, brackets, appshell*/
 define(function (require, exports, module) {
 	"use strict";
 
- 	var AppInit = brackets.getModule("utils/AppInit");
+	var AppInit = brackets.getModule("utils/AppInit");
 	var EditorManager = brackets.getModule("editor/EditorManager");
 	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
 	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
 
 	var fs = appshell.MakeDrive.fs();
 	var parentWindow = window.parent;
-	var sourceCode;
 	var codeMirror;
 	var params = new UrlParams();
 
@@ -56,5 +57,5 @@ define(function (require, exports, module) {
 		});
 
 		return deferred.promise();
-	}
+	};
 });
