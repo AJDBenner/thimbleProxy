@@ -27,11 +27,6 @@ define(function (require, exports, module) {
 		// listener to codemirror
 		codeMirror = EditorManager.getActiveEditor()._codeMirror;
 
-		parentWindow.postMessage(JSON.stringify({
-			type: "bramble:change",
-			sourceCode: codeMirror.getValue()
-		}), "*");
-
 		codeMirror.on("change", function(e){
 			parentWindow.postMessage(JSON.stringify({
 				type: "bramble:change",
@@ -40,21 +35,51 @@ define(function (require, exports, module) {
 		});
 	});
 
-	// Eventually, we'll listen for a message from
-	// thimble containing the make's initial code.
-	// For now, we are defaulting to thimble's starter
-	// make.
+	// We wait for thimble to send us the initial make and
+	// write it into the filesystem before allowing brackets
+	// to continue loading. Thimble passes us this information
+	// in the form of: {type: "bramble:init", source: "<CODE HERE>"}
 	exports.initExtension = function() {
 		var deferred = new $.Deferred();
+		var data;
 
-		fs.writeFile('/index.html', defaultHTML, function(err) {
-			if (err) {
+		function _getInitialDocument(e) {
+			try {
+				data = JSON.parse(e.data);
+			} catch(err) {
+				console.error("Parsing message from thimble failed: ", err);
+
 				deferred.reject();
 				return;
 			}
 
-			deferred.resolve();
-		});
+			// Remove the listener after we confirm the event is the
+			// one we're waiting for
+			if (data.type !== "bramble:init") {
+				return;
+			}
+			window.removeEventListener("message", _getInitialDocument);
+
+			fs.writeFile(
+				'/index.html',
+				data.source ? data.source : defaultHTML,
+				function(err) {
+					if (err) {
+						deferred.reject();
+						return;
+					}
+
+					deferred.resolve();
+				}
+			);
+		}
+		window.addEventListener("message", _getInitialDocument);
+
+		// Signal to thimble that we're waiting for the
+		// initial make source code
+		window.parent.postMessage(JSON.stringify({
+			type: "bramble:init"
+		}), "*");
 
 		return deferred.promise();
 	};
