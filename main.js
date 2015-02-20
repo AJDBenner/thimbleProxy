@@ -62,7 +62,7 @@ define(function (require, exports, module) {
 
 			fs.writeFile(
 				'/index.html',
-				data.source === "(none)" ? defaultHTML : data.source,
+				data.source ? data.source : defaultHTML,
 				function(err) {
 					if (err) {
 						deferred.reject();
