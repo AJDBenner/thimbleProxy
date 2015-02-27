@@ -8,8 +8,8 @@ define(function (require, exports, module) {
 	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
 	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
 	var ViewCommand = brackets.getModule("view/ViewCommandHandlers");
-    var Commands        = brackets.getModule("command/Commands");
-    var CommandManager  = brackets.getModule("command/CommandManager");
+	var Commands        = brackets.getModule("command/Commands");
+	var CommandManager  = brackets.getModule("command/CommandManager");
 
 	var fs = appshell.Filer.fs();
 	var parentWindow = window.parent;
