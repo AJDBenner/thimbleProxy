@@ -50,8 +50,8 @@ define(function (require, exports, module) {
 
 		function _getInitialDocument(e) {
 			try {
-				e.data = e.data || null;
-				data = JSON.parse(e.data);
+				data = e.data || null;
+				data = JSON.parse(data);
 				data = data || {};
 			} catch(err) {
 				// Quick fix: Ignore the 'process-tick' message being sent
