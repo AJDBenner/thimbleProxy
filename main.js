@@ -46,15 +46,52 @@ define(function (require, exports, module) {
 	// make.
 	exports.initExtension = function() {
 		var deferred = new $.Deferred();
+		var data;
 
-		fs.writeFile('/index.html', defaultHTML, function(err) {
-			if (err) {
+		function _getInitialDocument(e) {
+			try {
+				e.data = e.data || null;
+				data = JSON.parse(e.data);
+				data = data || {};
+			} catch(err) {
+				// Quick fix: Ignore the 'process-tick' message being sent
+				if(e.data === 'process-tick') {
+					return;
+				}
+
+				console.error("Parsing message from thimble failed: ", err);
+
 				deferred.reject();
 				return;
 			}
 
-			deferred.resolve();
-		});
+			// Remove the listener after we confirm the event is the
+			// one we're waiting for
+			if (data.type !== "bramble:init") {
+				return;
+			}
+			window.removeEventListener("message", _getInitialDocument);
+
+			fs.writeFile(
+				'/index.html',
+				data.source ? data.source : defaultHTML,
+				function(err) {
+					if (err) {
+						deferred.reject();
+						return;
+					}
+
+					deferred.resolve();
+				}
+			);
+		}
+		window.addEventListener("message", _getInitialDocument);
+
+		// Signal to thimble that we're waiting for the
+		// initial make source code
+		window.parent.postMessage(JSON.stringify({
+			type: "bramble:init"
+		}), "*");
 
 		return deferred.promise();
 	};
