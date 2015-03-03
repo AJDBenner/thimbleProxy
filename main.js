@@ -33,13 +33,13 @@ define(function (require, exports, module) {
             return;
         }
 
-        if(msgObj.type === "m_command"){
+        if(msgObj.type === "mCommand"){
             CommandManager.execute(Commands[msgObj.command]);
         }
-        else if (msgObj.type === "v_command") {
+        else if (msgObj.type === "vCommand") {
         	ViewCommand[msgObj.command](msgObj.extra);
         }
-	}
+    }
 
 	AppInit.appReady(function() {
 		// Once the app has loaded our file,
@@ -59,7 +59,6 @@ define(function (require, exports, module) {
 				sourceCode: codeMirror.getValue()
 			}), "*");
 		});
-		window.addEventListener("message", _listener);
 	});
 
 	// Eventually, we'll listen for a message from
@@ -93,7 +92,7 @@ define(function (require, exports, module) {
 				return;
 			}
 			window.removeEventListener("message", _getInitialDocument);
-
+			window.addEventListener("message", _listener);
 			fs.writeFile(
 				'/index.html',
 				data.source ? data.source : defaultHTML,
