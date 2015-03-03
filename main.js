@@ -7,6 +7,9 @@ define(function (require, exports, module) {
 	var EditorManager = brackets.getModule("editor/EditorManager");
 	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
 	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
+	var CommandManager = brackets.getModule("command/CommandManager");
+	var Commands = brackets.getModule("command/Commands");
+	var ViewCommand = brackets.getModule("view/ViewCommandHandlers");
 
 	var fs = appshell.Filer.fs();
 	var parentWindow = window.parent;
@@ -19,6 +22,24 @@ define(function (require, exports, module) {
 	// a new project
 	PreferencesManager.setViewState("afterFirstLaunch", false);
 	params.remove("skipSampleProjectLoad");
+
+	//This listener listens for commands from brambleproxy relating to buttons
+	function _listener(event) {
+		codeMirror.focus();
+		var msgObj;
+        try {
+            msgObj = JSON.parse(event.data);
+        } catch (e) {
+            return;
+        }
+
+        if(msgObj.type === "m_command"){
+            CommandManager.execute(Commands[msgObj.command]);
+        }
+        else if (msgObj.type === "v_command") {
+        	ViewCommand[msgObj.command](msgObj.extra);
+        }
+	}
 
 	AppInit.appReady(function() {
 		// Once the app has loaded our file,
@@ -38,6 +59,7 @@ define(function (require, exports, module) {
 				sourceCode: codeMirror.getValue()
 			}), "*");
 		});
+		window.addEventListener("message", _listener);
 	});
 
 	// Eventually, we'll listen for a message from
