@@ -8,8 +8,9 @@ define(function (require, exports, module) {
 	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
 	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
 	var CommandManager = brackets.getModule("command/CommandManager");
-	var Commands = brackets.getModule("command/Commands");
 	var ViewCommand = brackets.getModule("view/ViewCommandHandlers");
+	var Commands = brackets.getModule("command/Commands");
+	
 
 	var fs = appshell.Filer.fs();
 	var parentWindow = window.parent;
@@ -25,8 +26,8 @@ define(function (require, exports, module) {
 
 	//This listener listens for commands from brambleproxy relating to buttons
 	function _listener(event) {
-		codeMirror.focus();
-		var msgObj;
+        codeMirror.focus();
+        var msgObj;
         try {
             msgObj = JSON.parse(event.data);
         } catch (e) {
@@ -37,7 +38,7 @@ define(function (require, exports, module) {
             CommandManager.execute(Commands[msgObj.command]);
         }
         else if (msgObj.type === "vCommand") {
-        	ViewCommand[msgObj.command](msgObj.extra);
+            ViewCommand[msgObj.command](msgObj.extra);
         }
     }
 
