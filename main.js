@@ -7,6 +7,9 @@ define(function (require, exports, module) {
 	var EditorManager = brackets.getModule("editor/EditorManager");
 	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
 	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
+	var ViewCommand = brackets.getModule("view/ViewCommandHandlers");
+    var Commands        = brackets.getModule("command/Commands");
+    var CommandManager  = brackets.getModule("command/CommandManager");
 
 	var fs = appshell.Filer.fs();
 	var parentWindow = window.parent;
@@ -19,6 +22,24 @@ define(function (require, exports, module) {
 	// a new project
 	PreferencesManager.setViewState("afterFirstLaunch", false);
 	params.remove("skipSampleProjectLoad");
+
+	function _listener(event) {
+		if(event.data === "_undo") {
+			CommandManager.execute(Commands.EDIT_UNDO);
+		}
+		else if(event.data === "_redo") {
+			CommandManager.execute(Commands.EDIT_REDO);
+		}
+		else if(event.data === "_small") {
+			ViewCommand.setFontSize("8");
+		}
+		else if(event.data === "_normal") {
+			CommandManager.execute(Commands.VIEW_RESTORE_FONT_SIZE);
+		}
+		else if(event.data === "_large") {
+			ViewCommand.setFontSize("18");
+		}
+    }
 
 	AppInit.appReady(function() {
 		// Once the app has loaded our file,
@@ -38,6 +59,8 @@ define(function (require, exports, module) {
 				sourceCode: codeMirror.getValue()
 			}), "*");
 		});
+
+		window.addEventListener("message", _listener);
 	});
 
 	// Eventually, we'll listen for a message from
