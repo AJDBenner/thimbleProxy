@@ -29,7 +29,7 @@ define(function (require, exports, module) {
 	 * Its purpose is to intercept post messages from bramble proxy in thimble
 	 * some of these being:
 	 * undo, redo, size changer, or any other buttons relating to menu or view
-	 * within event we expect to receive a jsonable object that contains a type:
+	 * within event we expect to receive a jsonable object that contains a commandCategory:
 	 * menuCommand: "Menu Command" relating to menu commands runable, and
 	 * viewCommand: "View Command" relating to functions in viewcommand
 	 * also contains a variable of "params" which can be used to send further information needed
