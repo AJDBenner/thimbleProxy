@@ -32,7 +32,7 @@ define(function (require, exports, module) {
 	 * within event we expect to receive a jsonable object that contains a type:
 	 * mCommand: "Menu Command" relating to menu commands runable, and
 	 * vCommand: "View Command" relating to functions in viewcommand
-	 * also contains a variable of "extra" which can be used to send further information needed
+	 * also contains a variable of "params" which can be used to send further information needed
 	 */
 	function _buttonListener(event) {
         codeMirror.focus();
@@ -47,7 +47,7 @@ define(function (require, exports, module) {
             CommandManager.execute(Commands[msgObj.command]);
         }
         else if (msgObj.type === "vCommand") {
-            ViewCommand[msgObj.command](msgObj.extra);
+            ViewCommand[msgObj.command](msgObj.params);
         }
     }
 
