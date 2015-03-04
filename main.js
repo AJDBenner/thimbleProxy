@@ -24,7 +24,15 @@ define(function (require, exports, module) {
 	PreferencesManager.setViewState("afterFirstLaunch", false);
 	params.remove("skipSampleProjectLoad");
 
-	//This listener listens for commands from brambleproxy relating to buttons
+	/*
+	 * This function is attached to the window as an event listener
+	 * Its purpose is to intercept post messages that relate to thimble buttons such as:
+	 * undo, redo, size changer, or any other buttons relating to menu or view
+	 * within event we expect to receive a jsonable object that contains a type:
+	 * mCommand: "Menu Command" relating to menu commands runable, and
+	 * vCommand: "View Command" relating to functions in viewcommand
+	 * also contains a variable of "extra" which can be used to send further information needed
+	 */
 	function _listener(event) {
         codeMirror.focus();
         var msgObj;
