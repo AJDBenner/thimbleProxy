@@ -30,8 +30,8 @@ define(function (require, exports, module) {
 	 * some of these being:
 	 * undo, redo, size changer, or any other buttons relating to menu or view
 	 * within event we expect to receive a jsonable object that contains a type:
-	 * mCommand: "Menu Command" relating to menu commands runable, and
-	 * vCommand: "View Command" relating to functions in viewcommand
+	 * menuCommand: "Menu Command" relating to menu commands runable, and
+	 * viewCommand: "View Command" relating to functions in viewcommand
 	 * also contains a variable of "params" which can be used to send further information needed
 	 */
 	function _buttonListener(event) {
@@ -43,10 +43,10 @@ define(function (require, exports, module) {
             return;
         }
 
-        if(msgObj.type === "mCommand"){
+        if(msgObj.commandCategory === "menuCommand"){
             CommandManager.execute(Commands[msgObj.command]);
         }
-        else if (msgObj.type === "vCommand") {
+        else if (msgObj.commandCategory === "viewCommand") {
             ViewCommand[msgObj.command](msgObj.params);
         }
     }
