@@ -7,6 +7,10 @@ define(function (require, exports, module) {
 	var EditorManager = brackets.getModule("editor/EditorManager");
 	var PreferencesManager = brackets.getModule("preferences/PreferencesManager");
 	var UrlParams = brackets.getModule("utils/UrlParams").UrlParams;
+	var CommandManager = brackets.getModule("command/CommandManager");
+	var ViewCommand = brackets.getModule("view/ViewCommandHandlers");
+	var Commands = brackets.getModule("command/Commands");
+	
 
 	var fs = appshell.Filer.fs();
 	var parentWindow = window.parent;
@@ -19,6 +23,33 @@ define(function (require, exports, module) {
 	// a new project
 	PreferencesManager.setViewState("afterFirstLaunch", false);
 	params.remove("skipSampleProjectLoad");
+
+	/*
+	 * This function is attached to the window as an event listener
+	 * Its purpose is to intercept post messages from bramble proxy in thimble
+	 * some of these being:
+	 * undo, redo, size changer, or any other buttons relating to menu or view
+	 * within event we expect to receive a jsonable object that contains a type:
+	 * mCommand: "Menu Command" relating to menu commands runable, and
+	 * vCommand: "View Command" relating to functions in viewcommand
+	 * also contains a variable of "params" which can be used to send further information needed
+	 */
+	function _buttonListener(event) {
+        codeMirror.focus();
+        var msgObj;
+        try {
+            msgObj = JSON.parse(event.data);
+        } catch (e) {
+            return;
+        }
+
+        if(msgObj.type === "mCommand"){
+            CommandManager.execute(Commands[msgObj.command]);
+        }
+        else if (msgObj.type === "vCommand") {
+            ViewCommand[msgObj.command](msgObj.params);
+        }
+    }
 
 	AppInit.appReady(function() {
 		// Once the app has loaded our file,
@@ -71,7 +102,7 @@ define(function (require, exports, module) {
 				return;
 			}
 			window.removeEventListener("message", _getInitialDocument);
-
+			window.addEventListener("message", _buttonListener);
 			fs.writeFile(
 				'/index.html',
 				data.source ? data.source : defaultHTML,
