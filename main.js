@@ -26,14 +26,15 @@ define(function (require, exports, module) {
 
 	/*
 	 * This function is attached to the window as an event listener
-	 * Its purpose is to intercept post messages that relate to thimble buttons such as:
+	 * Its purpose is to intercept post messages from bramble proxy in thimble
+	 * some of these being:
 	 * undo, redo, size changer, or any other buttons relating to menu or view
 	 * within event we expect to receive a jsonable object that contains a type:
 	 * mCommand: "Menu Command" relating to menu commands runable, and
 	 * vCommand: "View Command" relating to functions in viewcommand
 	 * also contains a variable of "extra" which can be used to send further information needed
 	 */
-	function _listener(event) {
+	function _buttonListener(event) {
         codeMirror.focus();
         var msgObj;
         try {
@@ -101,7 +102,7 @@ define(function (require, exports, module) {
 				return;
 			}
 			window.removeEventListener("message", _getInitialDocument);
-			window.addEventListener("message", _listener);
+			window.addEventListener("message", _buttonListener);
 			fs.writeFile(
 				'/index.html',
 				data.source ? data.source : defaultHTML,
